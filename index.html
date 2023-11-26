@@ -11,113 +11,125 @@
 <body>
   <div class="container-3">
     <div class="header-elements">
-      <div class="BreedSnap">BreedSnap</div>
-      <div class="header-elements-2"><div>Home</div><div>How to use</div><div>About</div><div>Feedback</div></div>
+      <div class="BreedSnap"><a class="elements" href="">BreedSnap</a></div>
+      <div class="header-elements-2">
+        <div><a class="elements" href="#">Home</a></div>
+        <div><a class="elements" href="how_to_use.html">How to use</a></div>
+        <div><a class="elements" href="contactus.html">Contact Us</a></div>
+        <div><a class="elements" href="feedback.html">Feedback</a></div>
+      </div>
+    </div>
   </div>
 
   <div class="container-2">
-   <div class="container">
-    <div class="h-d">
-      <div class="heading">Click to Fetch: Identify Your Pet's Breed in a Snap!</div>
-      <div id="drop-area" onclick="TriggerFileInput()">
-        <p>Drag & Drop an image here or click to select an image </p>
+    <div class="container">
+      <div class="h-d">
+        <div class="heading">Click to Fetch: Identify Your Pet's Breed in a Snap!</div>
+        <div id="drop-area" onclick="TriggerFileInput()">
+          <p>Drag & Drop an image here or click to select an image </p>
+        </div>
+      </div>
+      <input id="photo" type="file" accept=".jpeg, .jpg, .png, .webp" style="display: none;" onchange="read()">
+      <div id="results"></div>
+      <!-- New elements to display photo and label outside the script block -->
+      <div id="output">
+        <img id="output-photo" class="out-photo" src="" width="220">
+        <div id="output-label"></div>
       </div>
     </div>
-    <input id="photo" type="file" accept=".jpeg, .jpg, .png, .webp" style="display: none;" onchange="read()">
-    <div id="results"></div>
-    <!-- New elements to display photo and label outside the script block -->
-    <div id="output">
-      <img id="output-photo" class="out-photo" src="" width="180">
-      <div id="output-label"></div>
+
+    <div class="examples-name">
+      <div class="example-2">Examples:</div>
+      <div class="example">
+        <div><img class="img" src="examples/basset-hound.webp" alt="error"></div>
+        <div><img class="img" src="examples/beagle.jpeg" alt="error"></div>
+        <div><img class="img" src="examples/bull_dog.jpeg" alt="error"></div>
+        <div><img class="img" src="examples/boxer.jpg" alt="error"></div>
+        <div><img class="img" src="examples/pug.jpg" alt="error"></div>
+        <div><img class="img" src="examples/pomeranian.webp" alt="error"></div>
+        <div><img class="img" src="examples/chihuahua.webp" alt="error"></div>
+        <div><img class="img" src="examples/shiba-inu.webp" alt="error"></div>
+        <!-- <div><img class="img" src="examples/shiba-inu.webp" alt="error"></div>
+        <div><img class="img" src="examples/shiba-inu.webp" alt="error"></div> -->
+      </div>
     </div>
   </div>
-  
-  <div class="examples-name">
-  <div class="example-2">Examples:</div>
-  <div  class="example">
-    <div><img class="img" src="examples/basset-hound.webp" alt="error"></div>
-    <div><img class="img" src="examples/beagle.jpeg" alt="error"></div>
-    <div><img class="img" src="examples/bull_dog.jpeg" alt="error"></div>
-    <div><img class="img" src="examples/boxer.jpg" alt="error"></div>
-    <div><img class="img" src="examples/pug.jpg" alt="error"></div>
-    <div><img class="img" src="examples/pomeranian.webp" alt="error"></div>
-    <div><img class="img" src="examples/chihuahua.webp" alt="error"></div>
-    <div><img class="img" src="examples/shiba-inu.webp" alt="error"></div>
-    <!-- <div><img class="img" src="examples/shiba-inu.webp" alt="error"></div>
-    <div><img class="img" src="examples/shiba-inu.webp" alt="error"></div> -->
-  </div>
-</div>
-</div>
-</div>    <script>
-      let photoData = null; // Variable to store photo data
-      let labelData = null; // Variable to store label data
+  <script>
+    let photoData = null; // Variable to store photo data
+    let labelData = null; // Variable to store label data
 
-      function TriggerFileInput() {
-        document.getElementById('photo').click();
-      }
+    function TriggerFileInput() {
+      document.getElementById('photo').click();
+    }
 
-      async function loaded(reader) {
-        const response = await fetch('https://jph00-pets.hf.space/api/predict', {
-          method: "POST",
-          body: JSON.stringify({
-            "data": [reader.result]
-          }),
-          headers: {
-            "Content-Type": "application/json"
-          }
-        });
-        const json = await response.json();
-        const label = json['data'][0]['confidences'][0]['label'];
-
-        // Save photo and label data in variables
-        photoData = reader.result;
-        labelData = label;
-
-        // Update the output elements
-        document.getElementById('output-photo').src = photoData;
-        document.getElementById('output-label').textContent = labelData;
-
-        // Update the results element
-        
-      }
-
-      function read() {
-        const photoInput = document.getElementById('photo');
-        const reader = new FileReader();
-
-        reader.addEventListener('load', () => loaded(reader));
-        reader.readAsDataURL(photoInput.files[0]);
-      }
-
-      function handleDrop(event) {
-        event.preventDefault();
-        const dataTransfer = event.dataTransfer;
-        const files = dataTransfer.files;
-
-        if (files.length > 0) {
-          document.getElementById('photo').files = files;
-          read();
+    async function loaded(reader) {
+      const response = await fetch('https://jph00-pets.hf.space/api/predict', {
+        method: "POST",
+        body: JSON.stringify({ "data": [reader.result] }),
+        headers: {
+          "Content-Type": "application/json"
         }
-      }
+      });
+      const json = await response.json();
+      const label = json['data'][0]['confidences'][0]['label'];
 
-      function handleDragOver(event) {
-        event.preventDefault();
-        const dropArea = document.getElementById('drop-area');
-        dropArea.style.border = '2px dashed #000';
-      }
+      // Save photo and label data in variables
+      photoData = reader.result;
+      labelData = label;
 
-      function handleDragLeave(event) {
-        event.preventDefault();
-        const dropArea = document.getElementById('drop-area');
-        dropArea.style.border = '2px dashed #ccc';
-      }
+      // Update the output elements
+      document.getElementById('output-photo').src = photoData;
+      document.getElementById('output-label').textContent = labelData;
+      // Update the results element
 
+      document.getElementById('output-photo').src = photoData;
+
+      // Update the label and trigger the animation
+      // const outputLabel = document.getElementById('output-label');
+      // outputLabel.textContent = labelData;
+      // outputLabel.style.animation = 'none'; // Reset animation
+      // void outputLabel.offsetWidth; // Trigger reflow
+      // outputLabel.style.animation = 'type 11s steps(60,end)'; // Start animation
+
+    }
+
+    function read() {
+      const photoInput = document.getElementById('photo');
+      const reader = new FileReader();
+
+      reader.addEventListener('load', () => loaded(reader));
+      reader.readAsDataURL(photoInput.files[0]);
+    }
+
+    function handleDrop(event) {
+      event.preventDefault();
+      const dataTransfer = event.dataTransfer;
+      const files = dataTransfer.files;
+
+      if (files.length > 0) {
+        document.getElementById('photo').files = files;
+        read();
+      }
+    }
+
+    function handleDragOver(event) {
+      event.preventDefault();
       const dropArea = document.getElementById('drop-area');
-      dropArea.addEventListener('dragover', handleDragOver);
-      dropArea.addEventListener('dragleave', handleDragLeave);
-      dropArea.addEventListener('drop', handleDrop);
-    </script>
-  
+      dropArea.style.border = '2px dashed #000';
+    }
+
+    function handleDragLeave(event) {
+      event.preventDefault();
+      const dropArea = document.getElementById('drop-area');
+      dropArea.style.border = '2px dashed #ccc';
+    }
+
+    const dropArea = document.getElementById('drop-area');
+    dropArea.addEventListener('dragover', handleDragOver);
+    dropArea.addEventListener('dragleave', handleDragLeave);
+    dropArea.addEventListener('drop', handleDrop);
+  </script>
+
 </body>
 
 </html>
